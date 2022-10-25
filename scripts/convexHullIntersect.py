@@ -1,11 +1,42 @@
 import bisect as bs
+from sortedcontainers import SortedList
+
+#Class segment that alocates two nodes and overloads the operators ">", "<" and "==" 
+#accord to the coordenate y of the left endpoint of the segment.
+class Segment:
+    
+    def __init__(self, nodeA, nodeB):
+        self.nodeA = nodeA
+        self.nodeB = nodeB
+    
+    def __gt__(sef, other):
+        if(self.nodeA.y > other.nodeA.y):
+            return True
+        else:
+            return False
+    
+    def __lt__(self, other):
+        if(self.nodeA.y < other.nodeA.y):
+            return True
+        else:
+            return False
+    
+    def __eq__(self, other):
+        if(self.nodeA.y == other.nodeA.y):
+            return True
+        else:
+            return False
+
+
 #Return a bool value to indicate whether two convex hulls intersects
 def convexHullIntersect(cvxHl_a, cvxHl_b):
 
     #List to allocate all points
     points = []
-    #List to allocate all the segments being tested in a scan pass
-    segments = []
+    #sortedList to allocate all the segments being tested in a scan pass
+    #Accord to documentation, sortedList is implemented as a  bintree, and the
+    #complexity time to add an item to list is O(log(n)).
+    segments = SortedList()
 
     #For each point p in both covex hulls, add a tuple in the form:
         #p[0] = point itself
@@ -13,13 +44,13 @@ def convexHullIntersect(cvxHl_a, cvxHl_b):
         #p[2] = the segment which the point is related to
     for i in range(len(cvxHl_a)):
         if(i < len(cvxHl_a) - 1):
-            seg = (cvxHl_a[i], cvxHl_a[i+1])
+            seg = Segment(cvxHl_a[i], cvxHl_a[i+1])
             left = min(cvxHl_a[i], cvxHl_a[i+1], key = lambda p : p.x)
             right = max(cvxHl_a[i], cvxHl_a[i+1], key = lambda p : p.x)
             points.append((left, 0, seg))
             points.append((right, 1, seg))
         else:
-            seg = (cvxHl_a[i], cvxHl_a[0])
+            seg = Segment(cvxHl_a[i], cvxHl_a[0])
             left = min(cvxHl_a[i], cvxHl_a[0], key = lambda p : p.x)
             right = max(cvxHl_a[i], cvxHl_a[0], key = lambda p : p.x)
             points.append((left, 0, seg))
@@ -27,13 +58,13 @@ def convexHullIntersect(cvxHl_a, cvxHl_b):
  
     for i in range(len(cvxHl_b)):
         if(i < len(cvxHl_b) - 1):
-            seg = (cvxHl_b[i], cvxHl_b[i+1])
+            seg = Segment(cvxHl_b[i], cvxHl_b[i+1])
             left = min(cvxHl_b[i], cvxHl_b[i+1], key = lambda p : p.x)
             right = max(cvxHl_b[i], cvxHl_b[i+1], key = lambda p : p.x)
             points.append((left, 0, seg))
             points.append((right, 1, seg))
         else:
-            seg =  (cvxHl_b[i], cvxHl_b[0])
+            seg =  Segment(cvxHl_b[i], cvxHl_b[0])
             left = min(cvxHl_b[i], cvxHl_b[0], key = lambda p : p.x)
             right = max(cvxHl_b[i], cvxHl_b[0], key = lambda p : p.x)
             points.append((left, 0, seg))
@@ -45,24 +76,24 @@ def convexHullIntersect(cvxHl_a, cvxHl_b):
     #Realize the scan of the points and tests if the segments intersects
     for point in points:
         seg = point[2]
-        keys = [r[0].y for r in segments]
-        i = bs.bisect_left(keys, seg[0].y)
+        #keys = [r[0].y for r in segments]
+        i = bs.bisect_left(segments, seg)
 
         if point[1] == 0:
             if(len(segments)==0):
-                segments.append(seg)
+                segments.add(seg)
             else:
-                segments.insert(i, seg)
-                if(i > 0 and segments[i-1][0].label != segments[i][0].label):
+                segments.add(seg)
+                if(i > 0 and segments[i-1].nodeA.label != segments[i].nodeA.label):
                     if(segmentsIntersect(segments[i-1], segments[i]) == True):
                         return True
 
-                if(i < (len(segments) - 1) and segments[i+1][0].label != segments[i][0].label):
+                if(i < (len(segments) - 1) and segments[i+1].nodeA.label != segments[i].nodeA.label):
                     if(segmentsIntersect(segments[i], segments[i+1]) == True):
                         return True
         
         else:
-            if(i > 0 and i < (len(segments) - 1) and segments[i-1][0].label != segments[i + 1][0].label):
+            if(i > 0 and i < (len(segments) - 1) and segments[i-1].nodeA.label != segments[i + 1].nodeA.label):
                 if(segmentsIntersect(segments[i-1], segments[i+1]) == True):
                     return True
                 else:
@@ -71,12 +102,13 @@ def convexHullIntersect(cvxHl_a, cvxHl_b):
     return False
     
     
-#Return a bool value to indicate whether two line segments intersects
+#Return a bool value to indicate whether two line segments intersects.
+#Expect a Segment() type object input.
 def segmentsIntersect(segA, segB):
-    pa0 = segA[0]
-    pa1 = segA[1]
-    pb0 = segB[0]
-    pb1 = segB[1]
+    pa0 = segA.nodeA
+    pa1 = segA.nodeB
+    pb0 = segB.nodeA
+    pb1 = segB.nodeB
     d1 = (pb1.x - pb0.x) * (pa0.y - pb0.y) - (pa0.x - pb0.x) * (pb1.y - pb0.y)
     d2 = (pb1.x - pb0.x) * (pa1.y - pb0.y) - (pa1.x - pb0.x) * (pb1.y - pb0.y)
     d3 = (pa1.x - pa0.x) * (pb0.y - pa0.y) - (pb0.x - pa0.x) * (pa1.y - pa0.y)
