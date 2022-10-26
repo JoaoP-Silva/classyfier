@@ -3,10 +3,12 @@ def euclidiana(p1,p2):
 
 def ForcaBruta(N, tam):
   min_val = float('inf')
+  closest_1 = Node(10,0,"A")
+  closest_2 = Node(10,0,"B")
   for i in range(tam):
     for j in range(i+1,tam):
       dist = euclidiana(N[i],N[j])
-      if (dist < min_val):
+      if (dist < min_val and N[i].label != N[j].label):
         min_val = dist
         closest_1 = N[i]
         closest_2 = N[j]
@@ -15,12 +17,15 @@ def ForcaBruta(N, tam):
 
 def ClosestStrip(strip,tam,d):
   min_val = d
+  closest_1 = Node(10,0,"A")
+  closest_2 = Node(10,0,"B")
   for i in range(tam):
     j = i + 1
     while j< tam and ((strip[j].y - strip[i].y) < min_val):
-      min_val = euclidiana(strip[i], strip[j])
-      closest_1 = strip[i]
-      closest_2 = strip[j]
+      if(strip[j].label != strip[i].label):
+        min_val = euclidiana(strip[i], strip[j])
+        closest_1 = strip[i]
+        closest_2 = strip[j]
       j += 1
   
   return min_val, closest_1,closest_2
