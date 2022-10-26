@@ -1,6 +1,5 @@
 from functools import cmp_to_key
 import numpy as np
-
 class Node:
   def __init__(self, x, y, label=None):
     self.x = x
@@ -8,8 +7,6 @@ class Node:
     self.label = label
 
 # essa função calcula o nó mais embaixo e, em caso de desempate, o mais a esquerda
-
-
 def calculateMinimumYCoord(nodes):
     minimumNode = nodes[0]
     for node in nodes[1:]:
@@ -51,43 +48,26 @@ def printNodes(nodes):
 
 # algoritmo graham's scan para envoltória convexa
 def convexHull(nodes):
+    nodes = orderByPolarAngle(nodes)
     if (len(nodes) < 3):
       print('Convex Hull does not exist')
     grahamStack = []
     for i in range(3):
         grahamStack.append(nodes[i])
     for i in range(3, len(nodes)):
-        if (crossProduct(grahamStack[1],grahamStack[2], nodes[i])):
-            grahamStack.pop()
+        while (1):
+            if(crossProduct(grahamStack[-2], nodes[i], grahamStack[-1]) >= 0):
+                grahamStack.pop()
+            else:
+                break
+
         grahamStack.append(nodes[i])
     return grahamStack
 
 # ordena por angulo polar utilizando orientação relativa por produto vetorial
 def orderByPolarAngle(nodes):
-    p0 = calculateMinimumYCoord(nodes)
-    nodes.remove(p0)
-    sortedNodes = sorted(nodes, key=cmp_to_key(compareVectors))
-    sortedNodes.insert(0, p0)
+    orderedNodes = nodes.copy()
+    orderedNodes.remove(p0)
+    sortedNodes = sorted(orderedNodes, key=cmp_to_key(compareVectors))
+    sortedNodes = [p0] +  sortedNodes
     return sortedNodes
-
-
-# exemplo:
-
-nodes = []
-nodes.append(Node(0,0))
-nodes.append(Node(1,1))
-nodes.append(Node(10,2))
-nodes.append(Node(10,5))
-nodes.append(Node(2, 34))
-nodes.append(Node(2,2))
-nodes.append(Node(3,1))
-nodes.append(Node(14,0.003))
-print('Todos os nós:')
-printNodes(nodes)
-print('Nós da envoltória:')
-
-p0 = calculateMinimumYCoord(nodes)
-CH = convexHull(orderByPolarAngle(nodes))
-printNodes(CH)
-
-
