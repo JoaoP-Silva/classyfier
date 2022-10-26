@@ -1,4 +1,5 @@
 from functools import cmp_to_key
+import numpy as np
 
 class Node:
   def __init__(self, x, y, label=None):
@@ -39,9 +40,9 @@ def compareVectors(p1, p2):
       else:
           return TURNS_RIGHT
 
-# calcula a distancia manhattan entre dois pontos
+# calcula a distancia euclidiana entre dois pontos
 def calculateDistance(p0,p1):
-    return abs(p1.x-p0.x) + abs(p1.y-p0.y);
+    return np.sqrt((p1.x - p0.x)**2 + (p1.y - p0.y)**2);
 
 # imprime os nós
 def printNodes(nodes):
