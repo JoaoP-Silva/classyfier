@@ -1,12 +1,10 @@
+import numpy as np
+from convexHull import Node
+
+#Returns the midpoint between p0 and p1
 def midPoint(p0, p1):
-    node = Node((p0.x+p1.x)/2,(p0.y+p1.y)/2,"MIDPOINT")
-
-##def findSlope(p0,p1):
-##    return (p1.y - p0.y)/(p1.x - p0.x)
-
-##def findTransversalLine(slope, midPoint):
-##    b = slope*midPoint.x - midPoint.y
-##    return (1/slope, midPoint.x, b)
+    mp = Node((p0.x+p1.x)/2,(p0.y+p1.y)/2)
+    return mp
 
 def Reta(p1,p2):
   x = np.linspace(p1.x,p2.x)
@@ -18,14 +16,60 @@ def Reta(p1,p2):
 def RetaPerpendicular(pm,m):
   m_inv = -1/m
   c = pm.y -(m_inv*pm.x)
-  y = m_inv*x + c
   return m_inv,c
 
-def classifier(equation, newNode):
-    a, x, b = equation
+#Classifies a new point from an equation and a point p1 with the label "1"
+def classifier(equation, newNode, p1):
+    a, b = equation
     y = a*newNode.x + b
 
-    if (y > newNode.y):
+    if(p1.y > y):
+      if(newNode.y > y):
         return 1
-    else:
+      else:
         return -1
+    
+    else:
+      if(newNode.y > y):
+        return -1
+      else:
+        return 1
+
+#Calculate precision, recall and f1-score by a list of evaluation points and the classifier.
+#Returns a list l[] with two lines, the first is related to the Class 1 and second related to 2.
+#Both lines are triples in the form l[][0] =  precision, l[][1] = recall and l[][2] =  f1score.
+def calculateMetrics(equation, points, p1):
+  result = []
+  totalA = 0
+  totalB = 0
+  matchA = 0
+  matchB = 0
+  falseA = 0
+  falseB = 0
+  for point in points:
+    pLabel = point.label
+    calcLabel = classifier(equation, points, p1)
+    if(pLabel == 1):
+      totalA = totalA + 1
+      if(pLabel == calcLabel):
+        matchA = matchA + 1
+      else:
+        falseB = falseB + 1
+    else:
+      totalB = totalB + 1
+      if(pLabel == calcLabel):
+        matchB = matchB + 1
+      else:
+        falseA = falseA + 1
+
+  precisionA = matchA/(matchA + falseA)
+  recallA = matchA/(matchA + falseB)
+  f1ScoreA = 2*precisionA*recallA / precisionA + recallA
+  result.append((precisionA, recallA, f1ScoreA))
+
+  precisionB = matchB/(matchB + falseB)
+  recallB = matchB/(matchB + falseA)
+  f1ScoreB = 2*precisionB*recallB / precisionB + recallB
+  result.append((precisionB, recallB, f1ScoreB))
+
+  return result

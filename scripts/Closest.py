@@ -1,3 +1,7 @@
+import copy
+import numpy as np
+from convexHull import Node
+
 def euclidiana(p1,p2):
   return np.sqrt(((p1.x-p2.x)**2 )+((p1.y-p2.y)**2))
 
@@ -66,9 +70,11 @@ def Closest(N, N_copy, tam):
   else:
     return min_b, close3,close4
 
-def ClosestPoints(N, tam):
+def ClosestPoints(chA, chB):
+  N = chA + chB
   N.sort(key = lambda point: point.x)
   N_copy = copy.deepcopy(N)
   N_copy.sort(key = lambda point: point.y)
+  result = Closest(N, N_copy, len(N))
 
-  return Closest(N, N_copy, len(N))
+  return result[1], result[2]
