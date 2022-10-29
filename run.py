@@ -58,12 +58,12 @@ if __name__ == '__main__':
 
     #A menu to select the models that will be runned
     all = ['appendicitis', 'banana', 'bupa', 'haberman', 'magic', 
-            'monk-2', 'phoneme', 'pima','saheart', 'iris']
+            'monk-2', 'phoneme', 'pima','saheart', 'iris', 'ecoli', 'coil2000', 'newthyroid']
     
     selected = []
     btn = -2
     display = ['1.appendicitis', '2.banana', '3.bupa', '4.haberman', '5.magic', '6.monk-2',
-                '7.phoneme', '8.pima','9.saheart', '10.iris', '11.run all']
+                '7.phoneme', '8.pima','9.saheart', '10.iris', '11.ecoli','12.coil2000', '13.newthyroid','14.run all']
                 
     while(btn != -1):
         print("Select the inputs:\n")
@@ -114,10 +114,23 @@ if __name__ == '__main__':
                 display[btn] = ""
                 selected.append("iris")
 
-            elif(display[btn] == "11.run all"):
+            elif(display[btn] == "14.run all"):
                 display[btn] = ""
                 selected = all
                 btn = -1
+            
+            elif(display[btn] == '11.ecoli'):
+                display[btn] = ""
+                selected.append("ecoli")
+            
+            elif(display[btn] == '12.coil2000'):
+                display[btn] = ""
+                selected.append("coil2000")
+            
+            elif(display[btn] == '13.newthyroid'):
+                display[btn] = ""
+                selected.append("newthyroid")
+
 
     f = open("output.txt","a")
     for input in selected:
