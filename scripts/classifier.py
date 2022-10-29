@@ -46,7 +46,7 @@ def calculateMetrics(equation, points, p1):
   falseB = 0
   for point in points:
     pLabel = point.label
-    calcLabel = classifier(equation, points, p1)
+    calcLabel = classifier(equation, point, p1)
     if(pLabel == 1):
       totalA = totalA + 1
       if(pLabel == calcLabel):

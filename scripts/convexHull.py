@@ -70,7 +70,7 @@ def convexHull(nodes):
         grahamStack.append(nodes[i])
     for i in range(3, len(nodes)):
         while (1):
-            if(crossProduct(grahamStack[-2], nodes[i], grahamStack[-1]) >= 0):
+            if(crossProduct(grahamStack[-2], nodes[i], grahamStack[-1]) > 0):
                 grahamStack.pop()
             else:
                 break

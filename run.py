@@ -18,19 +18,22 @@ def genInput(file):
     with open('%s/inputs/%s.dat'%(ROOT, file)) as f:
         for line in f:
             if line.startswith("@attribute Class"):
-                l = line.split("{")
+                l = line.split("{", 1)[1]
+                l = l.split("}")[0]
                 #Extract one label of the dataset
-                labelP = l[1].split(",")[0]
+                l = l.split(",")
+                labelDA = l[0].strip()
+                labelDB = l[-1].strip()
             if(not line.startswith("@")):
                 splited = line.split(",")
                 x = float(splited[0])
                 y = float(splited[1])
                 label = splited[-1].strip()
                 node = Node(x, y)
-                if(label == labelP):
+                if(label == labelDA):
                     node.label = 1
                     nodesA.append(node)
-                else:
+                elif(label == labelDB):
                     node.label = -1
                     nodesB.append(node)
 
@@ -55,12 +58,12 @@ if __name__ == '__main__':
 
     #A menu to select the models that will be runned
     all = ['appendicitis', 'banana', 'bupa', 'haberman', 'magic', 
-            'monk-2', 'phoneme', 'pima','saheart', 'titanic']
+            'monk-2', 'phoneme', 'pima','saheart', 'iris']
     
     selected = []
     btn = -2
     display = ['1.appendicitis', '2.banana', '3.bupa', '4.haberman', '5.magic', '6.monk-2',
-                '7.phoneme', '8.pima','9.saheart', '10.titanic', '11.run all']
+                '7.phoneme', '8.pima','9.saheart', '10.iris', '11.run all']
                 
     while(btn != -1):
         print("Select the inputs:\n")
@@ -107,9 +110,9 @@ if __name__ == '__main__':
                 display[btn] = ""
                 selected.append("saheart")
 
-            elif(display[btn] == "10.titanic"):
+            elif(display[btn] == "10.iris"):
                 display[btn] = ""
-                selected.append("titanic")
+                selected.append("iris")
 
             elif(display[btn] == "11.run all"):
                 display[btn] = ""
@@ -130,7 +133,7 @@ if __name__ == '__main__':
             #Calculate the closest points between the hulls
             pA, pB = ClosestPoints(chA, chB)
             mid = midPoint(pA, pB)
-            m, = Reta(pA,pB)
+            m = Reta(pA,pB)[0]
             equation = RetaPerpendicular(mid, m)
             #Get results and write on file
             result = calculateMetrics(equation, evalPoints, pA)
@@ -142,10 +145,10 @@ if __name__ == '__main__':
             recallB = result[1][1]
             f1scoreB = result[1][2]
 
-            s = (("set %s:\n\t precisionA = %f recallA = %f f1scoreA = %f"%(input, precisionA, recallA, f1scoreA)))
+            s = (("set %s:\n\t precisionA = %f recallA = %f f1scoreA = %f\n"%(input, precisionA, recallA, f1scoreA)))
             f.write(s)
-            s = (("\t precisionB = %f recallB = %f f1scoreB = %f"%(input, precisionB, recallB, f1scoreB)))
-
+            s = (("\t precisionB = %f recallB = %f f1scoreB = %f\n"%(precisionB, recallB, f1scoreB)))
+            f.write(s)
             print(("Writed output for %s")%(input))
 
     print("End.")
