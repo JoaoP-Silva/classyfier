@@ -7,6 +7,10 @@ def midPoint(p0, p1):
     return mp
 
 def Reta(p1,p2):
+  if(p1.x == p2.x):
+    p1.x += 0.00005
+  if(p1.y == p2.y):
+    p1.y += 0.00005
   x = np.linspace(p1.x,p2.x)
   m = (p1.y-p2.y)/(p1.x-p2.x)
   c = p1.y - (m*p1.x)
@@ -18,22 +22,16 @@ def RetaPerpendicular(pm,m):
   c = pm.y -(m_inv*pm.x)
   return m_inv,c
 
-#Classifies a new point from an equation and a point p1 with the label "1"
-def classifier(equation, newNode, p1):
+#Classifies a new point from an equation and a point p that is above the classifier line
+def classifier(equation, newNode, p):
     a, b = equation
     y = a*newNode.x + b
 
-    if(p1.y > y):
-      if(newNode.y > y):
-        return 1
-      else:
-        return -1
-    
+    if(newNode.y > y):
+      return p.label
     else:
-      if(newNode.y > y):
-        return -1
-      else:
-        return 1
+      return p.label * -1
+
 
 #Calculate precision, recall and f1-score by a list of evaluation points and the classifier.
 #Returns a list l[] with two lines, the first is related to the Class 1 and second related to 2.

@@ -6,7 +6,8 @@ sys.path.append(("%s/scripts")%(ROOT))
 
 from convexHull import *
 from convexHullIntersect import convexHullIntersect
-import Closest
+from Closest import ClosestPoints
+from classifier import *
 
 #Generates input from a file using Node class. Returns 3 sets of points, points to generate the
 #covex Hulls and the set of evaluation points.
@@ -19,15 +20,14 @@ def genInput(file):
             if line.startswith("@attribute Class"):
                 l = line.split("{")
                 #Extract one label of the dataset
-                labelP = l[1].split()
-
+                labelP = l[1].split(",")[0]
             if(not line.startswith("@")):
                 splited = line.split(",")
                 x = float(splited[0])
                 y = float(splited[1])
-                label = splited[-1]
+                label = splited[-1].strip()
                 node = Node(x, y)
-                if label == labelP:
+                if(label == labelP):
                     node.label = 1
                     nodesA.append(node)
                 else:
@@ -116,5 +116,38 @@ if __name__ == '__main__':
                 selected = all
                 btn = -1
 
+    f = open("output.txt","a")
     for input in selected:
         nodesA, nodesB, evalPoints = genInput(input)
+        #Calculate both convex hulls
+        chA = convexHull(nodesA)
+        chB = convexHull(nodesB)
+        #Test if its linearly separable
+        if(convexHullIntersect(chA, chB) == True):
+            s = (("set %s is not linearly separable\n")%(input))
+            f.write(s)
+        else:
+            #Calculate the closest points between the hulls
+            pA, pB = ClosestPoints(chA, chB)
+            mid = midPoint(pA, pB)
+            m, = Reta(pA,pB)
+            equation = RetaPerpendicular(mid, m)
+            #Get results and write on file
+            result = calculateMetrics(equation, evalPoints, pA)
+
+            precisionA = result[0][0]
+            recallA = result[0][1]
+            f1scoreA = result[0][2]
+            precisionB = result[1][0]
+            recallB = result[1][1]
+            f1scoreB = result[1][2]
+
+            s = (("set %s:\n\t precisionA = %f recallA = %f f1scoreA = %f"%(input, precisionA, recallA, f1scoreA)))
+            f.write(s)
+            s = (("\t precisionB = %f recallB = %f f1scoreB = %f"%(input, precisionB, recallB, f1scoreB)))
+
+            print(("Writed output for %s")%(input))
+
+    print("End.")
+
+
