@@ -62,8 +62,7 @@ if __name__ == '__main__':
                         elif(label == labelDB):
                             node.label = -1
                             nodesB.append(node)
-                subsetA = []
-                subsetB = []
+                            
                 sizA = int(len(nodesA) * 0.7)
                 sizB = int(len(nodesB) * 0.7)
 
