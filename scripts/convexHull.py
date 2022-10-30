@@ -1,6 +1,5 @@
 from functools import cmp_to_key
 import numpy as np
-from regex import R
 
 #p0 is a list to dynamically allocate the point with the smallest value with respect to y
 p0 = []
