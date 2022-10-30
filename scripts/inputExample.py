@@ -1,23 +1,15 @@
 import os
 import sys
-
-ROOT = os.path.abspath(os.path.join(os.path.abspath(__file__), os.pardir))
-sys.path.append(("%s/scripts")%(ROOT))
-
 from convexHull import *
 from convexHullIntersect import convexHullIntersect
 from Closest import ClosestPoints
 from classifier import *
-    
-if __name__ == '__main__': 
 
-    #A menu to select the models that will be runned
-    allData = ['balance', 'contraceptive', 'haberman', 'hayes-roth', 'heart', 'ionosphere', 'iris', 'magic',
-            'monk-2', 'newthyroid', 'phoneme', 'pima', 'ring', 'sonar', 'spambase', 'thyroid', 'titanic',
-            'twonorm', 'wdbc', 'wine']
 
-    for data in allData:
-        dt = open('%s/inputs/%s.dat'%(ROOT, data))
+#Generates a example input using the database 'iris.dat'.
+#Returns a tuple t in the form: t[0] = 70% of data from label A; t[1] = 70% of data from label B; t[2] = Eval points
+def inputExample():
+        dt = open('./inputs/iris.dat')
         lines = dt.readlines()
         att = 0
         index_data = -1
@@ -76,41 +68,15 @@ if __name__ == '__main__':
                 subset30B = nodesB[sizB:]
                 evalPoints = subset30A + subset30B
 
+                vanNodesA = subset70A
+                vanNodesB = subset70B
+
                 chA = convexHull(subset70A)
                 chB = convexHull(subset70B)
                 if(not convexHullIntersect(chA, chB)):
-                    flag = True
-                    #Calculate the closest points between the hulls
-                    pA, pB = ClosestPoints(chA, chB)
-                    mid = midPoint(pA, pB)
-                    m = Reta(pA,pB)[0]
-                    equation = RetaPerpendicular(mid, m)
-                    #Get results and write on file
-                    result = calculateMetrics(equation, evalPoints, pA)
-
-                    precisionA = result[0][0]
-                    recallA = result[0][1]
-                    f1scoreA = result[0][2]
-                    precisionB = result[1][0]
-                    recallB = result[1][1]
-                    f1scoreB = result[1][2]
-
-                    s = (("set %s, attributes %d and %d:\n\t precisionA = %f recallA = %f f1scoreA = %f\n"%(data, i, j, precisionA, recallA, f1scoreA)))
-                    f.write(s)
-                    s = (("\t precisionB = %f recallB = %f f1scoreB = %f\n"%(precisionB, recallB, f1scoreB)))
-                    f.write(s)
-                    print(("Writed output for %s")%(data))
-                    break
-            else:
-                continue
-
-            break
-        
-        if(not flag):
-            s = (("set %s is not linearly separable\n")%(data))
-            f.write(s)
-        
-
-    print("End.")
+                    return vanNodesA, vanNodesB, evalPoints
+                else:
+                    print('Error\n')
+                    return -1
 
 

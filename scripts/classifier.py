@@ -63,7 +63,7 @@ def calculateMetrics(equation, points, p1):
   precisionA = matchA/(matchA + falseA)
   recallA = matchA/(matchA + falseB)
   if(precisionA + recallA != 0):
-    f1ScoreA = 2*precisionA*recallA / precisionA + recallA
+    f1ScoreA = 2*precisionA*recallA / (precisionA + recallA)
   else:
     f1ScoreA = 0
   result.append((precisionA, recallA, f1ScoreA))
@@ -71,7 +71,7 @@ def calculateMetrics(equation, points, p1):
   precisionB = matchB/(matchB + falseB)
   recallB = matchB/(matchB + falseA)
   if(precisionB + recallB != 0):
-    f1ScoreB = 2*precisionB*recallB / precisionB + recallB
+    f1ScoreB = 2*precisionB*recallB / (precisionB + recallB)
   else:
     f1ScoreB = 0
   result.append((precisionB, recallB, f1ScoreB))
