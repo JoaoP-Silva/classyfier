@@ -68,12 +68,17 @@ def convexHull(nodes):
     for i in range(3):
         grahamStack.append(nodes[i])
     for i in range(3, len(nodes)):
-        while (1):
-            if(crossProduct(grahamStack[-2], nodes[i], grahamStack[-1]) > 0):
+        while(1):
+            cp = (crossProduct(grahamStack[-2], nodes[i], grahamStack[-1]))
+            if (cp==0):
+                if (calculateDistance(grahamStack[-2], nodes[i]) > calculateDistance(grahamStack[-2], grahamStack[-1])):
+                    cp = 1
+                else:
+                    cp = -1
+            if(cp > 0):
                 grahamStack.pop()
             else:
                 break
-
         grahamStack.append(nodes[i])
     return grahamStack
 
