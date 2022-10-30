@@ -32,7 +32,7 @@ def crossProduct(p0, p1, p2):
 
 TURNS_LEFT = 1
 TURNS_RIGHT = -1
-# retorna 1 se p0-p1 é anti-horario em relacao a p0-p2. caso sejam colineares, retorna 1 se p0-p1 > p0-p2
+# retorna 1 se p0-p1 é anti-horario em relacao a p0-p2. caso sejam colineares, retorna 1 se p0-p1 <= p0-p2
 def compareVectors(p1, p2):
     if(len(p0) == 0):
         print('Call calculateMinimumYCoord(nodes)')
@@ -45,9 +45,9 @@ def compareVectors(p1, p2):
       return TURNS_LEFT
     elif cp == 0:
       if calculateDistance(criticalP,p1) > calculateDistance(criticalP,p2):
-          return TURNS_LEFT
-      else:
           return TURNS_RIGHT
+      else:
+          return TURNS_LEFT
 
 # calcula a distancia euclidiana entre dois pontos
 def calculateDistance(p0,p1):
