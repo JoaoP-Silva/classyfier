@@ -5,11 +5,17 @@ import numpy as np
 p0 = []
 
 class Node:
-  def __init__(self, x, y, label=None):
-    self.x = x
-    self.y = y
-    self.label = label
+    def __init__(self, x, y, label=None):
+        self.x = x
+        self.y = y
+        self.label = label
 
+    def __hash__(self):
+        return hash((self.x, self.y, self.label))
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)): return NotImplemented
+        return self.x == other.x and self.y == other.y and self.y == other.y
 # essa função calcula o nó mais embaixo e, em caso de desempate, o mais a esquerda
 def calculateMinimumYCoord(nodes):
     while(len(p0)>0):

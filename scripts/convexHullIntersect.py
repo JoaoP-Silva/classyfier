@@ -1,6 +1,5 @@
 import bisect as bs
 from sortedcontainers import SortedList
-
 #Class segment that alocates two nodes and overloads the operators ">", "<" and "==" 
 #accord to the coordenate y of the left endpoint of the segment.
 class Segment:
@@ -9,17 +8,16 @@ class Segment:
         self.nodeA = nodeA
         self.nodeB = nodeB
     
-    def __gt__(sef, other):
+    def __gt__(self, other):
         if(self.nodeA.y > other.nodeA.y):
             return True
+        elif(self.nodeA.y == other.nodeA.y):
+            if(self.nodeB.y > other.nodeB.y):
+                return True
         else:
             return False
     
-    def __lt__(self, other):
-        if(self.nodeA.y < other.nodeA.y):
-            return True
-        else:
-            return False
+    
     
     def __eq__(self, other):
         if(self.nodeA.y == other.nodeA.y):
@@ -29,7 +27,22 @@ class Segment:
 
 
 #Return a bool value to indicate whether two convex hulls intersects
-def convexHullIntersect(cvxHl_a, cvxHl_b):
+def convexHullIntersect(chA, chB):
+
+    cvxHl_a = chA
+    cvxHl_b = chB
+
+    sA = set(cvxHl_a)
+    sB = set(cvxHl_b)
+
+    #If the two sets have the same item, return True
+    sResult = sA & sB
+
+    if (len(sResult) > 0):
+        return True
+    #Exclude duplicates
+    cvxHl_a = list( sA )
+    cvxHl_b = list( sB )
 
     #List to allocate all points
     points = []
@@ -37,48 +50,60 @@ def convexHullIntersect(cvxHl_a, cvxHl_b):
     #Accord to documentation, sortedList is implemented as a  bintree, and the
     #complexity time to add an item to list is O(log(n)).
     segments = SortedList()
-
+    
     #For each point p in both covex hulls, add a tuple in the form:
         #p[0] = point itself
-        #p[1] = 1 if it is a left endpoint of a segment. 0 if it is a right endpoint.
+        #p[1] = 0 if it is a left endpoint of a segment. 1 if it is a right endpoint.
         #p[2] = the segment which the point is related to
+    
+    if(len(cvxHl_a) < 3 or len (cvxHl_b) < 3):
+        return True
+
     for i in range(len(cvxHl_a)):
         if(i < len(cvxHl_a) - 1):
-            seg = Segment(cvxHl_a[i], cvxHl_a[i+1])
+            if(cvxHl_a[i].x == cvxHl_a[i+1].x):
+                cvxHl_a[i+1].x += 0.0005
             left = min(cvxHl_a[i], cvxHl_a[i+1], key = lambda p : p.x)
             right = max(cvxHl_a[i], cvxHl_a[i+1], key = lambda p : p.x)
+            seg = Segment(left, right)
             points.append((left, 0, seg))
             points.append((right, 1, seg))
         else:
-            seg = Segment(cvxHl_a[i], cvxHl_a[0])
+            if(cvxHl_a[i].x == cvxHl_a[0].x):
+                cvxHl_a[i].x += 0.0005
             left = min(cvxHl_a[i], cvxHl_a[0], key = lambda p : p.x)
             right = max(cvxHl_a[i], cvxHl_a[0], key = lambda p : p.x)
+            seg = Segment(left, right)
             points.append((left, 0, seg))
             points.append((right, 1, seg))
  
     for i in range(len(cvxHl_b)):
+        if (cvxHl_b[i].x == 12.25):
+            cvxHl_b[i].x = 12.25
         if(i < len(cvxHl_b) - 1):
-            seg = Segment(cvxHl_b[i], cvxHl_b[i+1])
+            if(cvxHl_b[i].x == cvxHl_b[i+1].x):
+                cvxHl_b[i+1].x += 0.0005
             left = min(cvxHl_b[i], cvxHl_b[i+1], key = lambda p : p.x)
             right = max(cvxHl_b[i], cvxHl_b[i+1], key = lambda p : p.x)
+            seg = Segment(left, right)
             points.append((left, 0, seg))
             points.append((right, 1, seg))
         else:
-            seg =  Segment(cvxHl_b[i], cvxHl_b[0])
+            if(cvxHl_b[i].x == cvxHl_b[0].x):
+                cvxHl_b[i].x += 0.0005
             left = min(cvxHl_b[i], cvxHl_b[0], key = lambda p : p.x)
             right = max(cvxHl_b[i], cvxHl_b[0], key = lambda p : p.x)
+            seg = Segment(left, right)
             points.append((left, 0, seg))
             points.append((right, 1, seg))
 
     #Sort the points from left to right
     points.sort(key = lambda tup : (tup[0].x, tup[1], tup[0].y))
-
+    
     #Realize the scan of the points and tests if the segments intersects
     for point in points:
         seg = point[2]
-        #keys = [r[0].y for r in segments]
         i = bs.bisect_left(segments, seg)
-
         if point[1] == 0:
             if(len(segments)==0):
                 segments.add(seg)
@@ -93,11 +118,11 @@ def convexHullIntersect(cvxHl_a, cvxHl_b):
                         return True
         
         else:
+            i = segments.index(seg)
             if(i > 0 and i < (len(segments) - 1) and segments[i-1].nodeA.label != segments[i + 1].nodeA.label):
                 if(segmentsIntersect(segments[i-1], segments[i+1]) == True):
                     return True
-                else:
-                    segments.pop(i)
+            segments.pop(i)
 
     return False
     
